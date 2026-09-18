@@ -1,0 +1,16 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+.venv/
+data/
+uploads/
+results/
+*.log
+*.mp3
+*.m4a
+*.wav
+*.ogg
+*.zip
+*.tar.gz
