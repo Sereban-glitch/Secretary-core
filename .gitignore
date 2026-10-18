@@ -14,3 +14,5 @@ results/
 *.ogg
 *.zip
 *.tar.gz
+mock-agrobot-uploads/
+demo-sine.wav

@@ -1,0 +1,4 @@
+#!/bin/sh
+set -eu
+runtime="${SECRETARY_FFMPEG_FLATPAK_RUNTIME:-org.freedesktop.Platform//25.08}"
+exec flatpak run --filesystem=host --filesystem=/tmp --command=ffmpeg "$runtime" "$@"

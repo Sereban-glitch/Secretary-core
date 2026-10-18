@@ -20,6 +20,22 @@ class ContractTests(unittest.TestCase):
         self.assertEqual(extract_text({"stop_reason": "end_turn", "content": [
             {"type": "text", "text": "Проверка"}]}), "Проверка")
 
+    def test_model_availability_notice_is_not_transcript(self):
+        response = {"stop_reason": "end_turn", "content": [{
+            "type": "text",
+            "text": ("Gemini 3.5 Flash is no longer available. "
+                     "Please switch to Gemini 3.7 Flash.")}]} 
+        with self.assertRaisesRegex(ValueError, "availability notice"):
+            extract_text(response)
+
+    def test_safety_filter_notice_is_not_transcript(self):
+        response = {"stop_reason": "end_turn", "content": [{
+            "type": "text",
+            "text": ("This request was blocked by Gemini's filters. "
+                     "Please try rephrasing your prompt.")}]} 
+        with self.assertRaisesRegex(ValueError, "safety filter notice"):
+            extract_text(response)
+
     def test_incomplete_and_invalid(self):
         for response in [{}, {"error": {}}, {"type": "error"},
                          {"stop_reason": "max_tokens", "content": [{"type": "text", "text": "обрыв"}]},

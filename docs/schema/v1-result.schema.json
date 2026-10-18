@@ -1,0 +1,104 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Sereban-glitch/Secretary-core/docs/schema/v1-result.schema.json",
+  "title": "Secretary Core result v1",
+  "description": "Результат задания расшифровки. Полный транскрипт неизменен; structured_draft — отдельный редакторский черновик; публикация в базу выполняется клиентом после проверки человеком.",
+  "type": "object",
+  "required": ["version", "job_id", "status", "created_at", "updated_at", "source", "segments", "transcript", "warnings", "provenance"],
+  "properties": {
+    "version": {"const": "1"},
+    "media_kind": {"enum": ["audio", "video"]},
+    "job_id": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
+    "status": {"enum": ["queued", "running", "completed", "partial", "failed", "cancelled"]},
+    "created_at": {"type": "string"},
+    "updated_at": {"type": "string"},
+    "source": {
+      "type": "object",
+      "required": ["filename", "sha256", "mime", "duration", "size"],
+      "properties": {
+        "filename": {"type": "string"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "mime": {"enum": ["audio/ogg", "audio/mpeg", "audio/mp4", "audio/wav", "video/mp4", "video/quicktime", "video/webm"]},
+        "duration": {"type": "number", "minimum": 0},
+        "size": {"type": "integer", "minimum": 0}
+      }
+    },
+    "segments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "start", "end", "status", "warnings"],
+        "properties": {
+          "id": {"type": "integer", "minimum": 0},
+          "start": {"type": "number", "minimum": 0},
+          "end": {"type": "number", "minimum": 0},
+          "status": {"enum": ["pending", "running", "done", "failed"]},
+          "text": {"type": ["string", "null"]},
+          "warnings": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "transcript": {"type": ["string", "null"]},
+    "structured_draft": {
+      "type": ["object", "null"],
+      "required": ["summary", "topics", "statements", "questionable_places", "speakers_note"],
+      "properties": {
+        "summary": {"type": "string"},
+        "topics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["title", "segments"],
+            "properties": {
+              "title": {"type": "string"},
+              "segments": {"type": "array", "items": {"type": "integer", "minimum": 0}}
+            }
+          }
+        },
+        "statements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["text", "segments", "confidence"],
+            "properties": {
+              "text": {"type": "string"},
+              "segments": {"type": "array", "items": {"type": "integer", "minimum": 0}},
+              "confidence": {"enum": ["supported", "unclear"]}
+            }
+          }
+        },
+        "questionable_places": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["issue", "segments"],
+            "properties": {
+              "issue": {"type": "string"},
+              "segments": {"type": "array", "items": {"type": "integer", "minimum": 0}},
+              "quote": {"type": "string"}
+            }
+          }
+        },
+        "speakers_note": {"type": "string"}
+      }
+    },
+    "warnings": {"type": "array", "items": {"type": "string"}},
+    "provenance": {
+      "type": "object",
+      "required": ["model", "transcribe_prompt_version", "structure_prompt_version", "audio_pipeline", "transport"],
+      "properties": {
+        "model": {"type": ["string", "null"]},
+        "transcribe_prompt_version": {"type": ["string", "null"]},
+        "structure_prompt_version": {"type": ["string", "null"]},
+        "structure_merge_prompt_version": {"type": ["string", "null"]},
+        "segment_seconds": {"type": ["number", "null"]},
+        "overlap_seconds": {"type": ["number", "null"]},
+        "audio_pipeline": {"type": ["string", "null"]},
+        "transport": {"type": ["string", "null"]},
+        "language": {"type": ["string", "null"]},
+        "vocabulary_terms": {"type": ["integer", "null"]}
+      }
+    },
+    "error": {"type": ["string", "null"]}
+  }
+}
